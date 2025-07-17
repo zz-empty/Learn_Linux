@@ -1,5 +1,6 @@
 #include "head.h"
 
+void my_ll(const char *filename);
 void print_ll(DIR *dirp);
 char* format_mode(mode_t mode);
 char* format_mtime(time_t mtime);
@@ -9,12 +10,17 @@ int main(int argc, char **argv)
     // ./my_ll [filename]
     ARGS_CHECK(argc, 2);
 
+    my_ll(argv[1]);
+
+    return 0;
+}
+
+void my_ll(const char *filename) {
     // 打开目录流
-    DIR *dirp = opendir(argv[1]);
+    DIR *dirp = opendir(filename);
     print_ll(dirp);
     // 关闭目录流
     closedir(dirp);
-    return 0;
 }
 
 void print_ll(DIR *dirp) {
