@@ -23,12 +23,20 @@ int process_chat(const char *pipe1, const char *pipe2) {
     // 用select管理fd
     fd_set rdset;
     char buf[1024];
+    struct timeval timeout; // 超时机制
     while (1) {
         FD_ZERO(&rdset);
         FD_SET(STDIN_FILENO, &rdset);
         FD_SET(fdr, &rdset);
-        int ret = select(fdr + 1, &rdset, NULL, NULL, NULL);
+        timeout.tv_sec = 300;
+        timeout.tv_usec = 10;
+        int ret = select(fdr + 1, &rdset, NULL, NULL, &timeout);
         RET_CHECK(ret, -1, "select");
+
+        if (0 == ret) {
+            printf("time out!\n");
+            break;  // 超时退出
+        }
 
         if (FD_ISSET(fdr, &rdset)) {
             // 读端就绪，读取数据
