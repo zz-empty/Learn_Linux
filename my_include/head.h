@@ -11,6 +11,7 @@
 #include <fcntl.h>
 #include <pwd.h>
 #include <grp.h>
+#include <sys/mman.h>
 
 // 检查命令行参数个数是否正确
 #define ARGS_CHECK(argc, num)                                                  \

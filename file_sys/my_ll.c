@@ -106,6 +106,4 @@ char* format_mode(mode_t mode) {
 
     str[10] = '\0';
     return str;
-
-
 }
