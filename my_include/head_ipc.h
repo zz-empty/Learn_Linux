@@ -6,6 +6,7 @@
 #include <sys/mman.h>
 #include <sys/select.h>
 #include <sys/shm.h>
+#include <sys/sem.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
