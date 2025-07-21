@@ -6,7 +6,7 @@ int main(int argc, char **argv)
     int NUM = atoi(argv[1]);
 
     int shmid = shmget(IPC_PRIVATE, 4096, IPC_CREAT | 0600);
-    char*p = (char*)shmat(shmid, NULL, 0);
+    int*p = (int*)shmat(shmid, NULL, 0);
 
     p[0] = 0;
 
@@ -24,6 +24,7 @@ int main(int argc, char **argv)
         wait(NULL);
         printf("Total = %d\n", p[0]);
         shmdt(p);
+        shmctl(shmid, IPC_RMID, NULL);
         exit(0);
     }
 
