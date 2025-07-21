@@ -5,6 +5,7 @@
 #include <sys/ipc.h>
 #include <sys/mman.h>
 #include <sys/select.h>
+#include <sys/shm.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
