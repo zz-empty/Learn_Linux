@@ -1,4 +1,5 @@
 #include "head.h"
+#include "msg.h"
 
 int main(int argc, char **argv)
 {
