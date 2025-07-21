@@ -8,20 +8,18 @@ int main()
     // 初始化信号量
     unsigned short val[] = {5, 5};
     semctl(semid, 0, SETALL, val);
-    struct sembuf consume[2];
-    consume[0].sem_num = 0;
-    consume[0].sem_op = -1;
-    consume[0].sem_flg = SEM_UNDO;
-    consume[1].sem_num = 0;
-    consume[1].sem_op = 1;
-    consume[1].sem_flg = SEM_UNDO;
-    struct sembuf produce[2];
-    produce[0].sem_num = 0;
-    produce[0].sem_op = 1;
-    produce[0].sem_flg = SEM_UNDO;
-    produce[1].sem_num = 0;
-    produce[1].sem_op = -1;
-    produce[1].sem_flg = SEM_UNDO;
+
+    // 先消费后释放空位
+    struct sembuf consume[2] = {
+        {.sem_num = 0, .sem_op = -1, .sem_flg = SEM_UNDO},
+        {.sem_num = 1, .sem_op = 1, .sem_flg = SEM_UNDO}
+    };
+
+    // 先申请空位后生产
+    struct sembuf produce[2] = {
+        {.sem_num = 1, .sem_op = -1, .sem_flg = SEM_UNDO},
+        {.sem_num = 0, .sem_op = 1, .sem_flg = SEM_UNDO}
+    };
 
     if (!fork()) {
         // 消费者
