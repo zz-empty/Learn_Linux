@@ -1,34 +1,61 @@
 #include "head.h"
 #include "chat.h"
 
+#define PID_FILE "pid_file"
 
-void sigint_handler(int signum) {
-    printf("ready quit!\n");
-    exit(0);
+int fd;
+int shmid, semid;
+Msg_t *p;
+int fdw, fdr;
+
+void write_pid() {
+    FILE *f = (FILE*)fopen(PID_FILE, "a+");
+    pid_t pid = getpid();
+    fprintf(f, "%s %d\n", "A", pid);
+    fclose(f);
+}
+
+void cleanup_ipc() {
+    if (fd > 0) close(fd);
+    close(fdr);
+    close(fdw);
+    shmdt(p);
+    shmctl(shmid, IPC_RMID, NULL);
+    semctl(semid, 0, IPC_RMID);
+}
+
+void sig_handler(int signum) {
+    pid_t pids[4] = {};
+    FILE *f = (FILE*)fopen("pid_file", "r");
+    char buf[10];
+    for (int i = 0; i < 4; ++i) {
+        fscanf(f, "%s%d", buf, &pids[i]);
+        /* printf("%s--->%d\n", buf, pids[i]); */
+        kill(pids[i], SIGUSR1);
+    }
+    fclose(f);
+
+    cleanup_ipc();
+    exit(EXIT_SUCCESS);
 }
 
 int chat(const char *r_pipe, const char *w_pipe, const char *chat_name) {
-    signal(SIGINT, sigint_handler);
+    write_pid();
 
-    int fd = open("test", O_RDWR);
+    signal(SIGINT, sig_handler);
+    signal(SIGUSR1, sig_handler);
 
+    fd = open("test", O_RDWR);
     // 建立共享内存和信号量
-    int shmid = shmget(1000, 128, IPC_CREAT | 0600);
+    shmid = shmget(1000, 4096, IPC_CREAT | 0600);
     RET_CHECK(shmid, -1, "shmget");
-    Msg_t *p = (Msg_t*)shmat(shmid, NULL, 0);
+    p = (Msg_t*)shmat(shmid, NULL, 0);
 
-    int semid = semget(1000, 1, IPC_CREAT | 0600);
+    semid = semget(1000, 1, IPC_CREAT | 0600);
     RET_CHECK(semid, -1, "semget");
     semctl(semid, 0, SETVAL, 1);
-    struct sembuf P;
-    P.sem_num = 0;
-    P.sem_op = -1;
-    P.sem_flg = SEM_UNDO;
-    struct sembuf V;
-    V.sem_num = 0;
-    V.sem_op = 1;
-    V.sem_flg = SEM_UNDO;
-
+    struct sembuf P = {0, -1, SEM_UNDO};
+    struct sembuf V = {0, +1, SEM_UNDO};
 
     // 接收对端进程消息和stdin
     Msg_t msg;
