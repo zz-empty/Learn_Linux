@@ -28,7 +28,7 @@ $(BIN_DIR):
 # 清理
 .PHONY: clean rebuild
 clean:
-	$(RM) $(BIN_TARGETS)
+	rm -rf $(BIN_DIR)
 
 # 重建
 rebuild: clean all
