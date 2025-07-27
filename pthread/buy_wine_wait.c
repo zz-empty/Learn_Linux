@@ -64,6 +64,9 @@ int main()
     ret = pthread_join(thid, NULL);
     PTHREAD_RET_CHECK(ret, "join pthread");
 
+    // 销毁锁和条件变量
+    pthread_mutex_destroy(&data.mutex);
+    pthread_cond_destroy(&data.cond);
     return 0;
 }
 
