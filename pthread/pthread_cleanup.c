@@ -2,11 +2,11 @@
 
 void *threadfunc(void *val) {
   printf("I am child_thread func! \n");
-  char *p = (char *)malloc(10);
+  char *p = (char *)malloc(128);
   strcpy(p, "this is child!");
   printf("p = %s\n", p);
-  printf("bye!\n");
   free(p);
+  printf("success free!\n");
   pthread_exit(NULL);
 }
 
