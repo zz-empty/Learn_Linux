@@ -18,7 +18,10 @@ void *threadfunc(void *val) {
         pthread_cond_wait(&data->cond, &data->mutex);
         printf("after wait!\n");
     }
-    printf("Child, buy a wine, very nice!\n");
+    if (0 < data->num) {
+        data->num--;
+        printf("Child, buy a wine, very nice!\n");
+    }
     pthread_mutex_unlock(&data->mutex);
 
     pthread_exit(NULL);
