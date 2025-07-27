@@ -14,7 +14,9 @@ void *threadfunc(void *val) {
   pthread_cleanup_push(cleanfunc, p);
   strcpy(p, "this is child!");
   printf("p = %s\n", p);
+  sleep(1);
   free(p);
+  p = NULL;
   printf("success free!\n");
   pthread_cleanup_pop(1);
   pthread_exit(NULL);
