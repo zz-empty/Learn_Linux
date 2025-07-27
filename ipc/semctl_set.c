@@ -12,7 +12,7 @@ int main()
 
     printf("perm = %o\n", statbuf.sem_perm.mode);
     printf("cuid = %d\n", statbuf.sem_perm.cuid);
-    printf("nsems = %ld\n", statbuf.sem_nsems);
+    printf("nsems = %hu\n", statbuf.sem_nsems);
 
     // 修改信号量的状态
     statbuf.sem_perm.mode = 0666;
