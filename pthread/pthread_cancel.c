@@ -2,6 +2,7 @@
 
 void *threadfunc(void *val) {
   printf("I am child_thread func! \n");
+  sleep(1);
   printf("come main!\n");
   pthread_exit(NULL);
 }
