@@ -2,23 +2,20 @@
 
 void cleanfunc(void *p) {
     printf("cleanfunc\n");
-    if (p) {
-        free(p);
-        p = NULL;
-    }
+    free(p);
+    p = NULL;
 }
 
 void *threadfunc(void *val) {
   printf("I am child_thread func! \n");
   char *p = (char *)malloc(128);
+
   pthread_cleanup_push(cleanfunc, p);
   strcpy(p, "this is child!");
   printf("p = %s\n", p);
-  sleep(1);
-  free(p);
-  p = NULL;
   printf("success free!\n");
   pthread_cleanup_pop(1);
+
   pthread_exit(NULL);
 }
 
@@ -30,7 +27,7 @@ int main() {
   PTHREAD_RET_CHECK(ret, "pthread_create");
   printf("I am main_thread func!\n");
 
-  pthread_cancel(thid);
+  /* pthread_cancel(thid); */
   pthread_join(thid, NULL);
   return 0;
 }
