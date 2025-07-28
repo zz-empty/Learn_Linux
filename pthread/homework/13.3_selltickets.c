@@ -11,6 +11,7 @@ typedef struct {
 
 void *sellTickets(void *val) {
     Data_t *data = (Data_t*)val;
+    int window = data->window;
 
     while (1) {
         pthread_mutex_lock(&data->mutex);
@@ -21,7 +22,7 @@ void *sellTickets(void *val) {
         } else if (0 < data->num) {
             // 卖一张
             data->num -= 1;
-            printf("[sell window %d] 卖出1张票\n", data->window);
+            printf("[sell window %d:%ld] 卖出1张票\n", window, pthread_self());
         }
         pthread_mutex_unlock(&data->mutex);
         usleep(100000);
