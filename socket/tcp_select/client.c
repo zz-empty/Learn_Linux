@@ -8,22 +8,22 @@ int main(int argc, char **argv)
     ARGS_CHECK(argc, 3);
     int ret = 0;
 
-    // 创建socket, 用于连接服务器
+    // 1. 创建socket, 用于连接服务器
     int server_fd = socket(AF_INET, SOCK_STREAM, 0);
     RET_CHECK(server_fd, -1, "socket");
 
-    // 设置服务器的ip和port
+    // 2. 设置服务器的ip和port
     struct sockaddr_in serAddr;
     memset(&serAddr, 0, sizeof(serAddr));
     serAddr.sin_family = AF_INET;
     serAddr.sin_port = htons(atoi(argv[2]));
     inet_pton(AF_INET, argv[1], &serAddr.sin_addr.s_addr);
 
-    // 连接服务器
+    // 3. 连接服务器
     ret = connect(server_fd, (struct sockaddr*)&serAddr, sizeof(serAddr));
     RET_CHECK(ret, -1, "connect");
 
-    // 设置select多路复用的参数
+    // 4. 设置select多路复用的参数
     fd_set fdset;       // select的临时位图
     fd_set initset;     // select轮询的原始位图
     FD_ZERO(&initset);
@@ -32,6 +32,7 @@ int main(int argc, char **argv)
     // select轮询的范围
     int maxfd = server_fd;
 
+    // 5. while与服务器通信
     int readyNum = 0;
     char buf[BUFSIZE] = "";
     while (1) {

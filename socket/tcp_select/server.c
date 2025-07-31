@@ -8,15 +8,15 @@ int main(int argc, char **argv)
     ARGS_CHECK(argc, 3);
     int ret = 0;
 
-    // 创建一个服务器监听socket
+    // 1. 创建一个服务器监听socket
     int server_fd = socket(AF_INET, SOCK_STREAM, 0);
     RET_CHECK(server_fd, -1, "socket");
 
-    // 设置socket可重用
+    // 2. 设置socket可重用
     int reuse = 1;
     setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
 
-    // 绑定服务器的ip和port
+    // 3. 绑定服务器的ip和port
     struct sockaddr_in serAddr;
     memset(&serAddr, 0, sizeof(serAddr));
     serAddr.sin_family = AF_INET;
@@ -27,11 +27,11 @@ int main(int argc, char **argv)
     RET_CHECK(ret, -1, "bind");
     printf("---[server] init server_fd---\n");
 
-    // 监听客户端的连接
+    // 4. 监听客户端的连接
     ret = listen(server_fd, 10);
     printf("---[server] listening...\n");
 
-    // 设置select多路复用的参数
+    // 5. 设置select多路复用的参数
     fd_set fdset;       // select的临时位图
     fd_set initset;     // select轮询的原始位图
     FD_ZERO(&initset);
@@ -40,6 +40,7 @@ int main(int argc, char **argv)
     // select轮询的范围
     int maxfd = server_fd;
 
+    // 6. while处理所有响应的fd
     int readyNum = 0;
     int cnt = 0;
     int newfd = 0;
