@@ -53,7 +53,7 @@ int main(int argc, char **argv)
                 ret = read(STDIN_FILENO, buf, sizeof(buf) - 1);
                 RET_CHECK(ret, -1, "read");
 
-                // 给服务器发请求
+                // 给服务器发请求, 去掉换行符
                 ret = sendto(server_fd, buf, ret - 1, 0, (struct sockaddr*)&serAddr, serlen);
                 RET_CHECK(ret, -1, "sendto");
             }

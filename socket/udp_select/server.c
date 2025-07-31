@@ -31,12 +31,13 @@ int main(int argc, char **argv)
     int maxfd = server_fd;
 
     // 用于接收客户端的ip和port
-    struct sockaddr_in *cliAddr;
+    struct sockaddr_in cliAddr;
     socklen_t clilen = 0;
 
     char buf[BUFSIZE] = "";
     int readyNum = 0;
     char ip[64] = "";
+    int port = 0;
     while (1) {
         FD_ZERO(&fdset);
         memcpy(&fdset, &initset, sizeof(fd_set));
@@ -48,23 +49,26 @@ int main(int argc, char **argv)
         for (int i = 0; i < readyNum; ++i) {
             if (FD_ISSET(server_fd, &fdset)) {
                 // 接收客户端信息，并重置客户端socket
+                memset(buf, 0, sizeof(buf));
                 ret = recvfrom(server_fd, buf, sizeof(buf) - 1, 0, (struct sockaddr*)&cliAddr, &clilen);
                 RET_CHECK(ret, -1, "recvfrom");
 
                 // 显示
-                inet_ntop(AF_INET, &cliAddr->sin_addr.s_addr, ip, sizeof(ip)); 
-                printf("[client ip:%s] %s\n", ip, buf);
+                if (ret) {
+                    inet_ntop(AF_INET, &cliAddr.sin_addr.s_addr, ip, sizeof(ip)); 
+                    port = ntohs(cliAddr.sin_port);
+                    printf("[client ip:%s-port:%d] %s\n", ip, port, buf);
+                }
             }
             if (FD_ISSET(STDIN_FILENO, &fdset)) {
                 // 读取stdin
+                memset(buf, 0, sizeof(buf));
                 ret = read(STDIN_FILENO, buf, sizeof(buf) - 1);
                 RET_CHECK(ret, -1, "read");
 
-                // 发送给客户端
-                if (clilen) {
-                    ret = sendto(server_fd, buf, ret - 1, 0, (struct sockaddr*)&cliAddr, clilen);
-                    RET_CHECK(ret, -1, "sendto");
-                }
+                // 发送给客户端, 去掉换行符
+                ret = sendto(server_fd, buf, ret - 1, 0, (struct sockaddr*)&cliAddr, clilen);
+                RET_CHECK(ret, -1, "sendto");
             }
         }
     }
