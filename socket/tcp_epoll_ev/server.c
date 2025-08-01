@@ -1,6 +1,7 @@
 #include "head.h"
 
 #define BUFSIZE 1024
+#define BUFMIN 5
 
 int main(int argc, char **argv)
 {
@@ -49,8 +50,8 @@ int main(int argc, char **argv)
     // 6. while处理所有响应的fd
     int readyNum = 0;
     int newfd = 0;
-    /* char buf[BUFSIZE] = ""; */
-    char buf[5] = "";
+    char buf[BUFSIZE] = "";
+    /* char buf[BUFMIN] = "";  // 测试ET模式的接收数据量 */
 
     struct epoll_event evs[2] = {};
     while (1) {
