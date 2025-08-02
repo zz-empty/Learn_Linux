@@ -19,15 +19,7 @@ typedef struct {
     int size;
 } Pool_t;
 
-// 配置信息结构
-typedef struct {
-    char ip[MAX_IP_LEN];
-    int port;
-    int workers;
-} Config_t;
 
-// 加载配置文件
-int load_config(const char *filename, Config_t *cfg);
 // 创建进程池
 int create_pool(Pool_t *pool);
 // 向管道里传入打开的文件描述符

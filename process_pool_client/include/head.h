@@ -46,3 +46,16 @@
       printf("%s:%s\n", msg, strerror(ret));                                   \
     }                                                                          \
   } while (0)
+
+#define MAX_IP_LEN 64
+#define MAX_LINE_LEN 256
+
+// 配置信息结构
+typedef struct {
+    char ip[MAX_IP_LEN];
+    int port;
+    int workers;
+} Config_t;
+
+// 加载配置文件
+int load_config(const char *filename, Config_t *cfg);

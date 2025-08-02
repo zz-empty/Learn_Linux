@@ -14,6 +14,8 @@ int worker_func(int pipefd) {
         RET_CHECK(ret, -1, "send");
 
         printf("------worker over, client_fd = %d-------\n", client_fd);
+        // 关掉
+        close(client_fd);
         // 通知父进程，任务执行完毕
         write(pipefd, "a", 1);
     }

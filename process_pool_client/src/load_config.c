@@ -1,4 +1,4 @@
-#include "process_pool.h"
+#include "head.h"
 
 // 取出字符串首位空白
 static char *trim(char *s) {
@@ -10,7 +10,7 @@ static char *trim(char *s) {
     end = s + strlen(s) - 1;
     while (end > s && isspace((unsigned char)*end)) end--;
     *(end + 1) = '\0';
-    return s;
+   return s;
 }
 
 int load_config(const char *filename, Config_t *cfg) {
