@@ -19,8 +19,7 @@ int main(int argc, char **argv)
     Config_t cfg = {};
     load_config(argv[1], &cfg);
 
-    printf("[config] ip = %s, ", cfg.ip);
-    printf("port = %d, ", cfg.port);
+    printf("[config] ip = %s, port = %d\n", cfg.ip, cfg.port);
 
     // 连接服务器
     int server_fd = socket(AF_INET, SOL_SOCKET, 0);

@@ -4,6 +4,7 @@ CC:=gcc
 SRCDIR := src
 INCDIR := include
 OBJDIR := obj
+BINDIR := bin
 
 # 所有源文件，和目标文件
 SRC := $(wildcard $(SRCDIR)/*.c)
@@ -11,7 +12,7 @@ OBJ := $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SRC))
 
 
 # 最终的可执行文件
-TARGET := server_pool
+TARGET := $(BINDIR)/app
 
 # 编译选项
 CFLAGS := -I$(INCDIR)
@@ -19,7 +20,10 @@ CFLAGS := -I$(INCDIR)
 
 all: $(TARGET)
 
-$(TARGET): $(OBJ)
+$(BINDIR):
+	mkdir -p $(BINDIR)
+
+$(TARGET): $(OBJ) | $(BINDIR)
 	$(CC) $(OBJ) -o $(TARGET)
 
 $(OBJDIR):
@@ -32,5 +36,5 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c | $(OBJDIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -rf $(OBJDIR) $(TARGET)
+	rm -rf $(OBJDIR) $(BINDIR)
 rebuild: clean all
