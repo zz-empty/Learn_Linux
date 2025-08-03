@@ -54,9 +54,8 @@ int receive_file(int server_fd) {
     ftruncate(fd, filesize);
 
     // 一次性全部接收
-    printf("[info] recv start...\n");
-    recvTotal(server_fd, pMap, filesize);
-    printf("[info] recv over...\n");
+    ret = recvTotal(server_fd, pMap, filesize);
+    RET_CHECK(ret, -1, "recvTotal");
 
     // 内容全部接收完毕
     printf("[info] %s download over!\n", filename);
