@@ -1,3 +1,6 @@
+#ifndef __HEAD_H__
+#define __HEAD_H__
+
 #include <fcntl.h>
 #include <pthread.h>
 #include <signal.h>
@@ -59,3 +62,6 @@ typedef struct {
 
 // 加载配置文件
 int load_config(const char *filename, Config_t *cfg);
+
+int receive_file(int server_fd);
+#endif
