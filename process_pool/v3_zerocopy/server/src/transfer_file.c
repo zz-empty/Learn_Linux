@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include "process_pool.h"
 
 #define MAX_DATA_LEN 1024
@@ -33,6 +34,7 @@ int transfer_file(int client_fd, const char *filename) {
     int fd = open(filename, O_RDWR);
     RET_CHECK(fd, -1, "open");
 
+#if 0
     // 使用零拷贝接口 mmap
     char *pMap = (char*)mmap(NULL, st.st_size, PROT_WRITE | PROT_READ, MAP_SHARED, fd, 0);
     RET_CHECK(pMap, (char*)-1, "mmap");
@@ -47,6 +49,21 @@ int transfer_file(int client_fd, const char *filename) {
 
     // 解除映射
     munmap(pMap, st.st_size);
+
+    // 使用零拷贝接口 sendfile
+    ret = sendfile(client_fd, fd, 0, st.st_size);
+    RET_CHECK(ret, -1, "sendfile");
+#endif
+    // 使用零拷贝接口 splice
+    int curlen = 0;
+    int sfd[2];
+    pipe(sfd);
+    while (curlen < st.st_size) {
+        ret = splice(fd, 0, sfd[1], 0, 4096, 0);
+        ret = splice(sfd[0], 0, client_fd, 0, ret, 0);
+        curlen += ret;
+    }
+
     close(fd);
     return 1;
 }
