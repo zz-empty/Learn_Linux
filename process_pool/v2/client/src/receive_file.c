@@ -16,28 +16,27 @@ int receive_file(int server_fd) {
     ret = recv(server_fd, data.data, data.datasize, 0);
     RET_CHECK(ret, -1, "recv");
 
-    printf("ready receive [%s]\n", data.data);
+    printf("[info] ready receive [%s]\n", data.data);
 
     // 再接收文件内容
     char filename[MAX_DATA_LEN];
     strcpy(filename, data.data);
     int fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0600);
     RET_CHECK(fd, -1, "open");
-    printf("download...\n");
     while (1) {
         // 先接收本段数据字节数
         ret = recv(server_fd, &data.datasize, sizeof(int), 0);
         RET_CHECK(ret, -1, "recv");
 
         if (0 == ret) {
-            printf("server exit!\n");
+            printf("[error] server exit!\n");
             break;
         }
 
         /* printf("datasize = %d\n", data.datasize); */
         if (0 == data.datasize) {
-            // 接收完毕
-            printf("[%s] download over!\n", filename);
+            // 内容全部接收完毕
+            printf("[info] %s download over!\n", filename);
             break;
         }
 

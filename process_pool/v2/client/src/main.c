@@ -19,7 +19,7 @@ int main(int argc, char **argv)
     Config_t cfg = {};
     load_config(argv[1], &cfg);
 
-    printf("[config] ip = %s, port = %d\n", cfg.ip, cfg.port);
+    printf("[info] server: ip = %s, port = %d\n", cfg.ip, cfg.port);
 
     // 连接服务器
     int server_fd = socket(AF_INET, SOL_SOCKET, 0);
@@ -34,7 +34,11 @@ int main(int argc, char **argv)
     ret = connect(server_fd, (struct sockaddr *)&serAddr, serlen);
     RET_CHECK(ret, -1, "connect");
 
-    printf("success connect server!------\n");
+    printf("[info] success connect server!------\n");
+
+    // 切换文件存储目录
+    ret = chdir(cfg.dir);
+    RET_CHECK(ret, -1, "chdir");
 
     // 接收文件
     receive_file(server_fd);

@@ -50,6 +50,10 @@ int load_config(const char *filename, Config_t *cfg) {
         else if (strcmp(key, "workers") == 0) {
             cfg->workers = atoi(value);
         } 
+        else if (strcmp(key, "dir") == 0) {
+            strncpy(cfg->dir, value, MAX_LINE_LEN - 1);
+            cfg->dir[MAX_LINE_LEN - 1] = '\0';
+        } 
         else {
             fprintf(stderr, "unknown key: %s\n", key);
         }

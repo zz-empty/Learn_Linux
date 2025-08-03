@@ -58,6 +58,7 @@ typedef struct {
     char ip[MAX_IP_LEN];
     int port;
     int workers;
+    char dir[MAX_LINE_LEN];
 } Config_t;
 
 // 加载配置文件
