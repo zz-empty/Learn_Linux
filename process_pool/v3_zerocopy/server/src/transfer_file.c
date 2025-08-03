@@ -59,7 +59,7 @@ int transfer_file(int client_fd, const char *filename) {
     int sfd[2];
     pipe(sfd);
     while (curlen < st.st_size) {
-        ret = splice(fd, 0, sfd[1], 0, 4096, 0);
+        ret = splice(fd, 0, sfd[1], 0, 65535, 0);
         ret = splice(sfd[0], 0, client_fd, 0, ret, 0);
         curlen += ret;
     }
