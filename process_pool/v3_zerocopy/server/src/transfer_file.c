@@ -38,15 +38,12 @@ int transfer_file(int client_fd, const char *filename) {
     RET_CHECK(pMap, (char*)-1, "mmap");
 
     // 一次性发送整个文件
-    printf("[info] send start\n");
     int total = 0;
     while (total < st.st_size) {
         ret = send(client_fd, pMap + total, st.st_size - total, 0);
         RET_CHECK(ret, -1, "send");
         total += ret;
-        printf("[debug] send %d bytes\n", ret);
     }
-    printf("[info] send over\n");
 
     // 解除映射
     munmap(pMap, st.st_size);
