@@ -63,7 +63,7 @@ int receive_file(int server_fd) {
     // 打印下载时间
     gettimeofday(&end, NULL);
     printf("[info] download time is %ld\n", 
-           (end.tv_usec - beg.tv_usec) * 1000000 + end.tv_sec - beg.tv_sec);
+           (end.tv_sec - beg.tv_sec) * 1000000 + end.tv_usec - beg.tv_usec);
 
     // 内容全部接收完毕
     printf("[info] %s download over!\n", filename);
