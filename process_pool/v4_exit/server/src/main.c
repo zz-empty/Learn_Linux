@@ -99,6 +99,7 @@ int main(int argc, char **argv)
             if (evs[i].data.fd == exit_pipes[0]) {
                 // 退出所有子进程
                 for (int j = 0; j < pool.size; ++j) {
+                    // 发送一个标志位为1的空任务
                     send_fd(pool.workers[j].pipefd, 0, 1);
                 }
                 for (int j = 0; j < pool.size; ++j) {

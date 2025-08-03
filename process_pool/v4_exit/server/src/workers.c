@@ -7,6 +7,7 @@ int worker_func(int pipefd) {
         char exitflag = 0;
         int ret = recv_fd(pipefd, &client_fd, &exitflag);
         RET_CHECK(ret, -1, "recv_fd");
+        // 检查是否退出
         if (exitflag) {
             printf("[signal] worker exit\n");
             exit(33);
