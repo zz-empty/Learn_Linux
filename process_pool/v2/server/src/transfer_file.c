@@ -16,6 +16,17 @@ int transfer_file(int client_fd, const char *filename) {
     ret = send(client_fd, &data, sizeof(data.datasize) + data.datasize, 0);
     RET_CHECK(ret, -1, "send");
 
+    // 传文件大小
+    struct stat st;
+    if (stat(filename, &st) < 0) {
+        perror("stat");
+        return -1;
+    }
+    data.datasize = sizeof(st.st_size);
+    memcpy(data.data, &st.st_size, data.datasize);
+    ret = send(client_fd, &data, sizeof(data.datasize) + data.datasize, 0);
+    RET_CHECK(ret, -1, "send");
+
     // 再传输文件内容
     /* printf("path: %s\n", getcwd(NULL, 0)); */
 
@@ -33,19 +44,20 @@ int transfer_file(int client_fd, const char *filename) {
         }
 
         /* printf("datasize = %d\n", data.datasize); */
-        // 限制发送速度
-        /* sleep(1); */
 
         // 发送给客户端
         ret = send(client_fd, &data, sizeof(data.datasize) + data.datasize, 0);
         RET_CHECK(ret, -1, "send");
 
+
+#if 0
         // 确定客户端正确接收
         ret = recv(client_fd, &data.datasize, 1, 0);
         if (0 == ret) {
             printf("[warning] client exit!\n");
             break;
         }
+#endif
     }
 
     close(fd);
