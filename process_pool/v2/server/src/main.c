@@ -42,9 +42,11 @@ int main(int argc, char **argv)
     Config_t cfg = {};
     load_config(argv[1], &cfg);
 
-    printf("[config] ip = %s, ", cfg.ip);
-    printf("port = %d, ", cfg.port);
-    printf("workers = %d\n", cfg.workers);
+    printf("[info] server: ip = %s, port = %d, workers = %d, dir = %s\n", cfg.ip, cfg.port, cfg.workers, cfg.dir);
+
+    // 切换工作目录
+    ret = chdir(cfg.dir);
+    RET_CHECK(ret, -1, "chdir");
 
     // 创建进程池
     Pool_t pool = {};
@@ -67,7 +69,7 @@ int main(int argc, char **argv)
         RET_CHECK(ret, -1, "epoll_add");
     }
 
-    printf("[Pool] inited, start listen...\n");
+    printf("[info] Pool inited, start listen...\n");
 
     // 开始启动
     // 分配新的客户端任务，给空闲的子进程
