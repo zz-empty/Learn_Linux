@@ -25,21 +25,25 @@ int transfer_file(int client_fd, const char *filename) {
         data.datasize = read(fd, data.data, MAX_DATA_LEN - 1);
         if (0 == data.datasize) {
             // 传输完毕
+            printf("----file transfer success!--------\n");
             break;
         }
 
         /* printf("datasize = %d\n", data.datasize); */
+        // 限制发送速度
         /* sleep(1); */
 
         // 发送给客户端
         ret = send(client_fd, &data, sizeof(data.datasize) + data.datasize, 0);
         RET_CHECK(ret, -1, "send");
+
+        // 确定客户端正确接收
+        ret = recv(client_fd, &data.datasize, 1, 0);
         if (0 == ret) {
             printf("client exit!\n");
             break;
         }
     }
-    printf("----file transfer success!--------\n");
 
     close(fd);
     return 1;
