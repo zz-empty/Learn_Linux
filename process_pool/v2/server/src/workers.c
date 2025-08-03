@@ -7,10 +7,10 @@ int worker_func(int pipefd) {
         int ret = recv_fd(pipefd, &client_fd);
         RET_CHECK(ret, -1, "recv_fd");
 
-        printf("------worker start, client_fd = %d-------\n", client_fd);
+        printf("[info] worker..., cfd = %d-------\n", client_fd);
         // 执行任务
         transfer_file(client_fd, "file1");
-        printf("------worker over, client_fd = %d-------\n", client_fd);
+        printf("[info] workered, cfd = %d-------\n", client_fd);
 
 
         // 关掉

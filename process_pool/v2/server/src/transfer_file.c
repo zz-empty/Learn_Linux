@@ -17,6 +17,8 @@ int transfer_file(int client_fd, const char *filename) {
     RET_CHECK(ret, -1, "send");
 
     // 再传输文件内容
+    /* printf("path: %s\n", getcwd(NULL, 0)); */
+
     int fd = open(filename, O_RDWR);
     RET_CHECK(fd, -1, "open");
 
@@ -25,7 +27,8 @@ int transfer_file(int client_fd, const char *filename) {
         data.datasize = read(fd, data.data, MAX_DATA_LEN - 1);
         if (0 == data.datasize) {
             // 传输完毕
-            printf("----file transfer success!--------\n");
+            printf("[info] file transfer success!\n");
+            send(client_fd, &data, sizeof(data.datasize), 0);
             break;
         }
 
@@ -40,7 +43,7 @@ int transfer_file(int client_fd, const char *filename) {
         // 确定客户端正确接收
         ret = recv(client_fd, &data.datasize, 1, 0);
         if (0 == ret) {
-            printf("client exit!\n");
+            printf("[warning] client exit!\n");
             break;
         }
     }
