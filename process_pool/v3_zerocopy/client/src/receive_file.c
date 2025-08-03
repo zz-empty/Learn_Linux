@@ -45,6 +45,9 @@ int receive_file(int server_fd) {
     int fd = open(filename, O_RDWR | O_CREAT | O_TRUNC, 0600);
     RET_CHECK(fd, -1, "open");
 
+    // 测试下载时间
+    struct timeval beg, end;
+    gettimeofday(&beg, NULL);
 
     // 使用mmap接收
     char *pMap = (char*)mmap(NULL, filesize, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
@@ -56,6 +59,11 @@ int receive_file(int server_fd) {
     // 一次性全部接收
     ret = recvTotal(server_fd, pMap, filesize);
     RET_CHECK(ret, -1, "recvTotal");
+
+    // 打印下载时间
+    gettimeofday(&end, NULL);
+    printf("[info] download time is %ld\n", 
+           (end.tv_usec - beg.tv_usec) * 1000000 + end.tv_sec - beg.tv_sec);
 
     // 内容全部接收完毕
     printf("[info] %s download over!\n", filename);
