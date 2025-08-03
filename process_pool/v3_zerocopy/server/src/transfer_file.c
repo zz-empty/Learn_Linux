@@ -55,11 +55,14 @@ int transfer_file(int client_fd, const char *filename) {
     RET_CHECK(ret, -1, "sendfile");
 #endif
     // 使用零拷贝接口 splice
+    // 利用每次管道读取的字节数，控制发送速度
     int curlen = 0;
     int sfd[2];
     pipe(sfd);
     while (curlen < st.st_size) {
-        ret = splice(fd, 0, sfd[1], 0, 65535, 0);
+        /* ret = splice(fd, 0, sfd[1], 0, 65535, 0); */
+        /* ret = splice(fd, 0, sfd[1], 0, 128, 0); */
+        ret = splice(fd, 0, sfd[1], 0, st.st_size, 0);
         ret = splice(sfd[0], 0, client_fd, 0, ret, 0);
         curlen += ret;
     }
