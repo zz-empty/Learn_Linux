@@ -21,9 +21,11 @@ void *threadFunc(void *arg) {
         pthread_mutex_unlock(&que->mutex);
 
         // 处理任务，发送文件
+        printf("[work thread] start work...\n");
         const char *filename = "file1";
         transfer_file(clientFd, filename); 
-        pthread_cleanup_pop(1);
+        printf("[work thread] work over...\n");
+        pthread_cleanup_pop(0);
     }
     pthread_exit(NULL);
 }
