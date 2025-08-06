@@ -34,7 +34,7 @@ int main(int argc, char **argv)
     struct sockaddr_in cliAddr;
     socklen_t clilen = 0;
 
-    char buf[BUFSIZE] = "";
+    char buf[10] = "";
     int readyNum = 0;
     char ip[64] = "";
     int port = 0;

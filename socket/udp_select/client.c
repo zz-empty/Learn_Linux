@@ -1,6 +1,6 @@
 #include "head.h"
 
-#define BUFSIZE 1024
+#define BUFSIZE 6
 
 int main(int argc, char **argv)
 {
@@ -41,7 +41,7 @@ int main(int argc, char **argv)
         // 处理所有就绪的fd
         for (int i = 0; i < readyNum; ++i) {
             if (FD_ISSET(server_fd, &fdset)) {
-                // 接收客户端信息，并重置客户端socket
+                // 接收服务器消息
                 ret = recvfrom(server_fd, buf, sizeof(buf) - 1, 0, (struct sockaddr*)&serAddr, &serlen);
                 RET_CHECK(ret, -1, "recvfrom");
 
