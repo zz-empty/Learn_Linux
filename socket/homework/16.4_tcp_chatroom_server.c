@@ -140,7 +140,7 @@ int main()
                     data.datalen = strlen(data.data);
                     // 通知所有在线的用户，新用户的到来
                     for (int i = 0; i < room.capacity; ++i) {
-                        if (room.users[i].fd != user.fd && room.users[i].flag) {
+                        if (room.users[i].flag && room.users[i].fd != user.fd) {
                             ret = send(room.users[i].fd, &data, sizeof(int) + data.datalen, 0);
                             RET_CHECK(ret, -1, "send");
                         }
@@ -159,17 +159,24 @@ int main()
 
                         // 如果是客户端意外退出，修改room配置，并通知其他所有在线的客户端
                         if (0 == ret) {
+                            // 从监控的位图中删除
+                            FD_CLR(room.users[i].fd, &monitor);
                             room.users[i].flag = 0;     // 用户下线
                             room.size--;                // 减少用户数量
                             printf("[info] user-%s exit! room.size:%d, room.capacity:%d\n", room.users[i].username, room.size, room.capacity);
 
+                            // 拼接退出信息, 然后修改头长
                             memset(&data, 0, sizeof(data));
                             sprintf(data.data, "[chat room inform] %s exit!\n", room.users[i].username);
+                            data.datalen = strlen(data.data);
                             // 通知其他在线的用户，退出信息
-                            for (int j = 0; j < room.capacity && room.users[j].flag; ++j) {
-                                ret = send(room.users[j].fd, &data, sizeof(int) + data.datalen, 0);
-                                RET_CHECK(ret, -1, "send_inform_userexit");
+                            for (int j = 0; j < room.capacity; ++j) {
+                                if (room.users[j].flag) {
+                                    ret = send(room.users[j].fd, &data, sizeof(int) + data.datalen, 0);
+                                    RET_CHECK(ret, -1, "send_inform_userexit");
+                                }
                             }
+
                             break;
                         }
 
@@ -178,10 +185,11 @@ int main()
                         ret = recv(room.users[i].fd, buf, data.datalen, 0);
                         RET_CHECK(ret, -1, "recv");
 
+                        // 拼接正常信息, 然后修改头长
                         sprintf(data.data, "[%s] %s", room.users[i].username, buf);
                         data.datalen = strlen(data.data);
-                        for (int j = 0; j < room.capacity && room.users[j].flag; ++j) {
-                            if (room.users[j].fd != room.users[i].fd) {
+                        for (int j = 0; j < room.capacity; ++j) {
+                            if (room.users[j].flag && room.users[j].fd != room.users[i].fd) {
                                 ret = send(room.users[j].fd, &data, sizeof(int) + data.datalen, 0);
                                 RET_CHECK(ret, -1, "send");
                             }
