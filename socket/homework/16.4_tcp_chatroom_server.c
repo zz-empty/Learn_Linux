@@ -142,10 +142,12 @@ int main()
                 // 加入聊天室
                 joinRoom(&room, &user);
                 printf("[info] %s join room succeed! room.size:%d, room.capacity:%d\n", user.username, room.size, room.capacity);
-                // 拼接欢迎信息
+                // 给新用户发送欢迎信息
                 memset(&data, 0, sizeof(data));
-                sprintf(data.data, "[chat room inform] new user come : %s!", user.username);
+                sprintf(data.data, "Welcome %s join happy chatroom!", user.username);
                 data.datalen = strlen(data.data);
+                ret = send(user.fd, &data, sizeof(int) + data.datalen, 0);
+                RET_CHECK(ret, -1, "send");
                 // 通知所有在线的用户，新用户的到来
                 for (int i = 0; i < room.capacity; ++i) {
                     if (room.users[i].flag && room.users[i].fd != user.fd) {
