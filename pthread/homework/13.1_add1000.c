@@ -12,7 +12,7 @@ void cleanupfunc(void *val) {
     pthread_mutex_unlock((pthread_mutex_t*)val);
 }
 
-void *sigfunc(void *val) {
+void *threadfunc(void *val) {
     Data_t *data = (Data_t*)val;
     for (int i = 0; i < MAX; ++i) {
         pthread_mutex_lock(&data->mutex);
@@ -39,8 +39,8 @@ int main()
 
     // 创建两个线程，各加1000万
     pthread_t t1, t2;
-    pthread_create(&t1, NULL, sigfunc, &data);
-    pthread_create(&t2, NULL, sigfunc, &data);
+    pthread_create(&t1, NULL, threadfunc, &data);
+    pthread_create(&t2, NULL, threadfunc, &data);
 
     pthread_join(t1, NULL);
     pthread_join(t2, NULL);
