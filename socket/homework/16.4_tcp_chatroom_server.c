@@ -114,6 +114,20 @@ int main()
                 user.fd = accept(server_fd, NULL, 0);
                 RET_CHECK(user.fd, -1, "accept");
 
+                // 判断聊天室是否已满
+                if (room.size == room.capacity) {
+                    // 无法加入，聊天室已满
+                    const char *msg = "room is fulled, cannot join!";
+                    printf("[warning] %s\n", msg);
+
+                    // 通知客户端加入失败
+                    memset(&data, 0, sizeof(data));
+                    data.datalen = -2;  // 已满标志
+                    send(user.fd, &data.datalen, sizeof(int), 0);
+                    close(user.fd);
+                    continue;
+                }
+
                 // 加入监听，修改最大描述符
                 FD_SET(user.fd, &monitor);
                 maxfd = maxfd > user.fd ? maxfd : user.fd;
@@ -126,27 +140,17 @@ int main()
                 printf("[info] username recv succeed! username=%s\n", user.username);
 
                 // 加入聊天室
-                ret = joinRoom(&room, &user);
-                if (0 == ret) {
-                    // 加入失败，聊天室已满
-                    const char *msg = "room is fulled, cannot join!";
-                    printf("[warning] %s\n", msg);
-
-                    // 通知客户端加入失败
-                    send(user.fd, "1", 1, 0);
-                } else {
-                    // 加入成功，
-                    printf("[info] %s join room succeed! room.size:%d, room.capacity:%d\n", user.username, room.size, room.capacity);
-                    // 拼接欢迎信息
-                    memset(&data, 0, sizeof(data));
-                    sprintf(data.data, "[chat room inform] new user come : %s!", user.username);
-                    data.datalen = strlen(data.data);
-                    // 通知所有在线的用户，新用户的到来
-                    for (int i = 0; i < room.capacity; ++i) {
-                        if (room.users[i].flag && room.users[i].fd != user.fd) {
-                            ret = send(room.users[i].fd, &data, sizeof(int) + data.datalen, 0);
-                            RET_CHECK(ret, -1, "send");
-                        }
+                joinRoom(&room, &user);
+                printf("[info] %s join room succeed! room.size:%d, room.capacity:%d\n", user.username, room.size, room.capacity);
+                // 拼接欢迎信息
+                memset(&data, 0, sizeof(data));
+                sprintf(data.data, "[chat room inform] new user come : %s!", user.username);
+                data.datalen = strlen(data.data);
+                // 通知所有在线的用户，新用户的到来
+                for (int i = 0; i < room.capacity; ++i) {
+                    if (room.users[i].flag && room.users[i].fd != user.fd) {
+                        ret = send(room.users[i].fd, &data, sizeof(int) + data.datalen, 0);
+                        RET_CHECK(ret, -1, "send");
                     }
                 }
             }
