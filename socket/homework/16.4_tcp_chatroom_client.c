@@ -66,6 +66,11 @@ int main(int argc, char **argv)
                     printf("[error] room full, cannot join\n");
                     return -1;
                 }
+                if (0 == ret) {
+                    // 服务器退出
+                    printf("[error] server exit!\n");
+                    return -1;
+                }
                 // 接收指定长度的信息
                 ret = recv(server_fd, data.data, data.datalen, 0);
                 RET_CHECK(ret, -1, "recv");
