@@ -79,6 +79,9 @@ int main()
     serAddr.sin_addr.s_addr = inet_addr(ip);
     serAddr.sin_port = htons(port);
 
+    int optval = 1;
+    setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
+
     ret = bind(server_fd, (struct sockaddr*)&serAddr, sizeof(serAddr));
     RET_CHECK(ret, -1, "bind");
 
