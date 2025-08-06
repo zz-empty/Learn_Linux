@@ -61,7 +61,7 @@ int main(int argc, char **argv)
                 // 先接收信息的长度
                 ret = recv(server_fd, &data.datalen, sizeof(int), 0);
                 RET_CHECK(ret, -1, "recv");
-                if (-1 == data.datalen) {
+                if (-2 == data.datalen) {
                     // 聊天室已满
                     printf("[error] room full, cannot join\n");
                     return -1;
