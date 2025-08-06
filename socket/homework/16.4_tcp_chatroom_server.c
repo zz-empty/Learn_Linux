@@ -205,5 +205,6 @@ int main()
     }
 
     close(server_fd);
+    destoryRoom(&room);
     return 0;
 }
