@@ -18,6 +18,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <sys/epoll.h>
 
 // 检查命令行参数个数是否正确
 #define ARGS_CHECK(argc, num)                                                  \
