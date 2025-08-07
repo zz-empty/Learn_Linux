@@ -114,7 +114,9 @@ int main(int argc, char **argv)
                     }
                     else {
                         // 其他错误, 关闭fd
+                        perror("recv");
                         close(client_fd);
+                        break;
                     }
                 }
             }
