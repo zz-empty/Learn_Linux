@@ -1,5 +1,6 @@
 #ifndef __HEAD_H__
 #define __HEAD_H__
+
 #include <fcntl.h>
 #include <pthread.h>
 #include <signal.h>
@@ -49,6 +50,24 @@
       printf("%s:%s\n", msg, strerror(ret));                                   \
     }                                                                          \
   } while (0)
+
+
+#define IP_SIZE 34
+#define LINE_SIZE 1024
+
+// 配置信息结构
+typedef struct {
+    char *ip;
+    int port;
+    int workers;
+    char *home;
+} Config_t;
+
+// 配置文件
+int loadConfig(const char *filename, Config_t *cfg);
+void printConfig(Config_t *cfg);
+void freeConfig(Config_t *cfg);
+
 
 int transfer_file(int client_fd, const char *filename);
 
