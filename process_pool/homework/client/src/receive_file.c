@@ -33,14 +33,18 @@ int receiveFile(int serverFd) {
     while (1) {
         memset(&data, 0, sizeof(Data_t));
         ret = recv(serverFd, &data.len, sizeof(int), 0);
-        RET_CHECK(ret, -1, "recv");
+        RET_CHECK(ret, -1, "recv_head");
+        if (0 == ret) {
+            printf("[error] server exit!\n");
+            break;
+        }
         if (0 == data.len) {
             // 文件已全部接收完毕
             printf("[info] 收到全部数据！\n");
             break;
         }
-        ret = recv(serverFd, &data.data, data.len, 0);
-        RET_CHECK(ret, -1, "recv");
+        ret = recv(serverFd, data.data, data.len, MSG_WAITALL);
+        RET_CHECK(ret, -1, "recv_body");
 
         // 写入文件
         ret = write(fd, data.data, data.len);
