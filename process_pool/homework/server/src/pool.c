@@ -1,10 +1,32 @@
 #include "head.h"
 #include "pool.h"
 
-int workerFunc(int pipefd) {
-    int cfd = 0;
+int workerFunc(int pipeFd) {
+    int ret = 0;
+    Task_t task = {};
     while (1) {
         // 等待任务并处理
+        ret = recvFd(pipeFd, &task);
+        if (-1 == ret) {
+            // recvmsg出错
+            printf("[error] recv task error!\n");
+            continue;
+        }
+
+        if (1 == task.exitFlag) {
+            // 结束Worker进程
+            printf("[warning] SIGUSR1 comming, worker exit!\n");
+            return 33;
+        }
+
+        // 执行任务
+        transferFile(task.clientFd);        
+
+        // 任务结束
+        close(task.clientFd);
+        // 通知Master，将自己设为非忙碌，等待下个任务
+        ret = write(pipeFd, "1", 1);      // pipeFd是全双工的
+        RET_CHECK(ret, -1, "write");
     }
 }
 
@@ -31,8 +53,8 @@ int initPool(Pool_t *pool, Config_t cfg) {
         if (0 == pid) {
             // 开启工作逻辑，准备从Master中接收任务并处理
             close(fds[1]);  // Worker只负责接收任务
-            workerFunc(fds[0]);
-            exit(0);
+            ret = workerFunc(fds[0]);
+            exit(ret);
         }
 
         // Master将新创建的子进程的pid和pipefd加入管理组
