@@ -30,6 +30,7 @@ int receiveFile(int serverFd) {
     RET_CHECK(fd, -1, "open");
 
     printf("[info] start receive...\n");
+    int curLen = 0;
     while (1) {
         memset(&data, 0, sizeof(Data_t));
         ret = recv(serverFd, &data.len, sizeof(int), 0);
@@ -38,9 +39,14 @@ int receiveFile(int serverFd) {
             printf("[error] server exit!\n");
             break;
         }
+
+        // 打印进度条
+        curLen += data.len;
+        show_progress(curLen, filesize, 80);
+
         if (0 == data.len) {
             // 文件已全部接收完毕
-            printf("[info] 收到全部数据！\n");
+            printf("\n[info] 收到全部数据！\n");
             break;
         }
         ret = recv(serverFd, data.data, data.len, MSG_WAITALL);
