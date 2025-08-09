@@ -68,7 +68,7 @@ int loadConfig(const char *filename, Config_t *cfg);
 void printConfig(Config_t *cfg);
 void freeConfig(Config_t *cfg);
 
-
-int transfer_file(int client_fd, const char *filename);
+// 建立tcp监听
+int tcpListen(Config_t cfg);
 
 #endif
