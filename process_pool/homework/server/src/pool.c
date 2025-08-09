@@ -4,18 +4,19 @@
 int workerFunc(int pipeFd) {
     int ret = 0;
     Task_t task = {};
+    printf("--[Worker] worker inited!\n");
     while (1) {
         // 等待任务并处理
         ret = recvFd(pipeFd, &task);
         if (-1 == ret) {
             // recvmsg出错
-            printf("[error] recv task error!\n");
+            printf("--[Worker] recv task error!\n");
             continue;
         }
 
         if (1 == task.exitFlag) {
             // 结束Worker进程
-            printf("[warning] SIGUSR1 comming, worker exit!\n");
+            printf("--[Worker] SIGUSR1 comming, worker exit!\n");
             return 33;
         }
 
