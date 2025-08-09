@@ -1,0 +1,42 @@
+#include "head.h"
+#include "pool.h"
+
+int workerFunc(int pipefd) {
+    while (1) {
+        // 等待任务并处理
+    }
+}
+
+int initPool(Pool_t *pool, Config_t cfg) {
+    memset(pool, 0, sizeof(Pool_t));
+    int ret = 0;
+
+    // 初始化pool的参数
+    pool->size = cfg.workers;
+    pool->workers = (Worker_t*)calloc(pool->size, sizeof(Worker_t));
+    if (pool->workers == NULL) {
+        return -1;
+    }
+
+    // 创建size个进程
+    int fds[2];
+    for (int i = 0; i < pool->size; ++i) {
+        // 创建一对本地的套接口
+        ret = socketpair(AF_LOCAL, SOCK_STREAM, 0, fds);
+        RET_CHECK(ret, -1, "socketpair");
+
+        if (0 == fork()) {
+            // 子进程关闭套接口写端，开启工作逻辑，准备从Master中接收任务并处理
+            close(fds[1]);
+            workerFunc(fds[0]);
+            exit(0);
+        }
+    }
+    return 0;
+}
+
+void destroyPool(Pool_t *pool) {
+    pool->start = 0;
+    pool->size = 0;
+    free(pool->workers);
+}
