@@ -75,4 +75,7 @@ int tcpConnect(Config_t cfg);
 // 接收文件
 int receiveFile(int serverFd);
 
+// 打印进度条
+void show_progress(off_t downloaded, off_t total, int width);
+
 #endif
