@@ -20,15 +20,19 @@ typedef struct {
 // 任务结构
 typedef struct {
     short exitFlag;
-    int client_fd;
+    int clientFd;
 } Task_t;
 
 // 进程池
 int initPool(Pool_t *pool, Config_t cfg);
 void destroyPool(Pool_t *pool);
 
-// 分配任务&接收任务
+// Master分配任务
 int sendFd(int pipeFd, Task_t *task);
+// Worker接收任务
 int recvFd(int pipeFd, Task_t *task);
+
+// Worker的功能
+int transferFile(int clientFd);
 
 #endif
