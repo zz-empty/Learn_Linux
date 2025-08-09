@@ -37,11 +37,18 @@ int main(int argc, char **argv)
     chdir(cfg.home);
     printf("\n[Master] Entry home dir\n");
 
-    // 创建进程池
+    // 创建进程池并启动
     Pool_t pool;
     initPool(&pool, cfg);
-    // 启动
     pool.start = 1;
+
+    // 注册退出信号
+    pipe(exitPipe);
+    struct sigaction sa = {};
+    sa.sa_flags = SA_RESTART;
+    sa.sa_handler = sigFunc;
+    sigemptyset(&sa.sa_mask);
+    sigaction(SIGUSR1, &sa, NULL);
 
     // 建立tcp连接
     int serverFd = tcpListen(cfg);
@@ -54,8 +61,6 @@ int main(int argc, char **argv)
     int epfd = epoll_create(1);
     epollAdd(epfd, serverFd);
 
-    pipe(exitPipe);
-    signal(SIGUSR1, sigFunc);
     epollAdd(epfd, exitPipe[0]);
 
     for (int i = 0; i < pool.size; ++i) {
