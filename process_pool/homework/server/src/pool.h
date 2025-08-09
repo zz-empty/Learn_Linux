@@ -7,7 +7,7 @@
 typedef struct {
     short busy;
     pid_t pid;
-    int pipefd;
+    int pipeFd;
 } Worker_t;
 
 // 进程池

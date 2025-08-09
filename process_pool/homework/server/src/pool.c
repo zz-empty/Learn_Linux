@@ -2,6 +2,7 @@
 #include "pool.h"
 
 int workerFunc(int pipefd) {
+    int cfd = 0;
     while (1) {
         // 等待任务并处理
     }
@@ -20,17 +21,25 @@ int initPool(Pool_t *pool, Config_t cfg) {
 
     // 创建size个进程
     int fds[2];
+    pid_t pid;
     for (int i = 0; i < pool->size; ++i) {
         // 创建一对本地的套接口
         ret = socketpair(AF_LOCAL, SOCK_STREAM, 0, fds);
         RET_CHECK(ret, -1, "socketpair");
 
-        if (0 == fork()) {
-            // 子进程关闭套接口写端，开启工作逻辑，准备从Master中接收任务并处理
-            close(fds[1]);
+        pid = fork();
+        if (0 == pid) {
+            // 开启工作逻辑，准备从Master中接收任务并处理
+            close(fds[1]);  // Worker只负责接收任务
             workerFunc(fds[0]);
             exit(0);
         }
+
+        // Master将新创建的子进程的pid和pipefd加入管理组
+        close(fds[0]);  // 关闭读端，Master只负责分配任务
+        pool->workers[i].busy = 0;
+        pool->workers[i].pid = pid;
+        pool->workers[i].pipeFd = fds[1];
     }
     return 0;
 }
