@@ -16,22 +16,21 @@ int sendFd(int pipeFd, Task_t *task) {
     msg.msg_iovlen = 1;
 
     // msg的5、6参数
-    int len = CMSG_LEN(sizeof(Task_t));
-    struct cmsghdr *cmsg = (struct cmsghdr*)calloc(1, len);
-    cmsg->cmsg_len = len;
+    char contorl[CMSG_SPACE(sizeof(int))];
+    msg.msg_control = contorl;
+    msg.msg_controllen = sizeof(contorl);
+
+    struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msg);
     cmsg->cmsg_level = SOL_SOCKET;
     cmsg->cmsg_type = SCM_RIGHTS;
-    *(Task_t*)CMSG_DATA(cmsg) = *task;
+    cmsg->cmsg_len = CMSG_LEN(sizeof(int));
+    // 将fd放入
+    *(int*)CMSG_DATA(cmsg) = task->clientFd;
 
-    // 挂载到msg
-    msg.msg_control = cmsg;
-    msg.msg_controllen = len;
-    
     // 传输给pipeFd
     int ret = sendmsg(pipeFd, &msg, 0);
     RET_CHECK(ret, -1, "sendmsg");
 
-    free(cmsg);
     return 0;
 }
 
@@ -40,25 +39,26 @@ int recvFd(int pipeFd, Task_t *task) {
     struct msghdr msg = {};
     
     // msg的3、4参数
-    struct iovec iov = {};
+    struct iovec iov = {
+        .iov_base = task,
+        .iov_len = sizeof(Task_t)
+    };
     // 挂载到msg
     msg.msg_iov = &iov;
     msg.msg_iovlen = 1;
 
     // msg的5、6参数
-    int len = CMSG_LEN(sizeof(Task_t));
-    struct cmsghdr *cmsg = (struct cmsghdr*)calloc(1, len);
-    // 挂载到msg
-    msg.msg_control = cmsg;
-    msg.msg_controllen = len;
+    char contorl[CMSG_SPACE(sizeof(int))];
+    msg.msg_control = contorl;
+    msg.msg_controllen = sizeof(contorl);
 
     // 从pipeFd中接收
     int ret = recvmsg(pipeFd, &msg, 0);
     RET_CHECK(ret, -1, "recvmsg");
 
-    // 卸货
-    *task = *(Task_t*)CMSG_DATA(cmsg);
-    free(cmsg);
+    struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msg);
+    task->clientFd = *(int*)CMSG_DATA(cmsg);
+
     return 0;
 }
 
