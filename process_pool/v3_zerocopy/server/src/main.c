@@ -2,7 +2,7 @@
 #include "process_pool.h"
 
 int init_socket(Config_t cfg) {
-    int server_fd = socket(AF_INET, SOL_SOCKET, 0);
+    int server_fd = socket(AF_INET, SOCK_STREAM, 0);
     RET_CHECK(server_fd, -1, "socket");
 
     struct sockaddr_in serAddr = {};
