@@ -66,7 +66,7 @@ typedef struct {
 
 // 配置文件
 int loadConfig(const char *filename, Config_t *cfg);
-void printConfig(Config_t *cfg);
+void printConfig(Config_t cfg);
 void freeConfig(Config_t *cfg);
 
 // 建立tcp监听
