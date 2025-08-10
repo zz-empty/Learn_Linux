@@ -33,7 +33,8 @@ int transferFile(int clientFd) {
     int filesize = st.st_size;
     int fds[2];
     pipe(fds);
-    int rate = 10;
+    /* int rate = 10; */
+    int rate = filesize;
     while (curLen < filesize) {
         ret = splice(fd, 0, fds[1], 0, rate, 0);
         ret = splice(fds[0], 0, clientFd, 0, ret, 0);
